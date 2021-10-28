@@ -11,8 +11,22 @@ api = Api(app)
 class AirportConditions(Resource):
 
 	def get(self):
-		x = Weather()
-		return x.getFlightCategory('KJFK'), 200
+		
+		wx = Weather()
+
+		parser = reqparse.RequestParser()
+		parser.add_argument('airportCode', required=True, type=str)
+
+		args = parser.parse_args()
+
+		isLoaded, data = wx.getMetar(args['airportCode'])
+
+		if isLoaded:
+			return {
+				f"{args['airportCode']}": data
+			}, 200
+		else:
+			return data, 409	
 
 
 class Weather():
@@ -22,7 +36,7 @@ class Weather():
 		self.headerLines = 5
 		self.data = {}
 
-	def getMetars(self):
+	def loadMetars(self):
 		
 		req = requests.get(self.url)
 		df = pd.read_csv(io.StringIO(req.text), skiprows=self.headerLines)
@@ -38,12 +52,16 @@ class Weather():
 
 		return 1
 
-	def getFlightCategory(self, airportCode):
+	def getMetar(self, airportCode):
 
-		if self.getMetars() == 1:
-			return self.data[airportCode]
+		if self.loadMetars() == 1:
+			try:
+				return 1, self.data[airportCode]
+			except KeyError:
+				return 0, {'Error': 'Invalid airport code'}
+
 		else:
-			return {'Error': 'Error parsing METARS...'}
+			return 0, {'Error': 'Error parsing METARS...'}
 
 api.add_resource(AirportConditions, '/conditions')
 
