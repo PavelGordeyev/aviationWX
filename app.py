@@ -4,6 +4,8 @@ import requests
 import pandas as pd
 import io
 import json
+import os
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -34,8 +36,9 @@ class Weather():
 	def __init__(self):
 		self.url = 'https://www.aviationweather.gov/adds/dataserver_current/current/metars.cache.csv'
 		self.headerLines = 5
+		self.minutesToUpdate = 10
 		self.data = None
-		self.jsonURL = './weather_data.json'
+		self.weather_json_url = './weather_data.json'
 
 
 	def loadMetars(self):
@@ -77,13 +80,21 @@ class Weather():
 
 	def loadToFile(self):
 
-		with open(self.jsonURL, 'w') as f:
+		with open(self.weather_json_url, 'w') as f:
 			json.dump(self.data, f)
 
 	def loadFromFile(self):
 
 		try:
-			with open(self.jsonURL, 'r') as f:
+			with open(self.weather_json_url, 'r') as f:
+				
+				# Check last time the data was modified
+				modified = os.path.getmtime(self.weather_json_url)
+
+				if time.time() - (self.minutesToUpdate * 60 * 1000) > modified:
+					self.pullMetars()
+					return
+
 				self.data = json.load(f)
 		
 		except FileNotFoundError:
