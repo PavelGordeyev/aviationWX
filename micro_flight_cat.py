@@ -21,7 +21,7 @@ class FlightCategory(Resource):
 		res = requests.get(self.url + args['airportCode'])
 
 		if res.status_code == 404:
-			return {'Error': 'Invalid api url...'}
+			return {'Error': '404 - Not found'}, 404
 		else:
 			try:
 				return {
@@ -31,7 +31,7 @@ class FlightCategory(Resource):
 			except Exception as e:
 				return {
 					"Error": e
-				}, 409	
+				}, 404	
 
 api.add_resource(FlightCategory, '/flightcat')
 
