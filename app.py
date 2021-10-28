@@ -103,4 +103,4 @@ class Weather():
 api.add_resource(AirportConditions, '/conditions')
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run()
