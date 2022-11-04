@@ -17,15 +17,15 @@ class AirportConditions(Resource):
 		wx = Weather()
 
 		parser = reqparse.RequestParser()
-		parser.add_argument('airportCode', required=True, type=str)
+		parser.add_argument('airport_code', required=True, type=str)
 
 		args = parser.parse_args()
 
-		isLoaded, data = wx.getMetar(args['airportCode'].upper())
+		is_loaded, data = wx.getMetar(args['airport_code'].upper())
 
-		if isLoaded:
+		if is_loaded:
 			return {
-				f"{args['airportCode']}": data
+				f"{args['airport_code']}": data
 			}, 200
 		else:
 			return data, 404	
@@ -36,7 +36,7 @@ class Weather():
 	def __init__(self):
 		self.url = 'https://www.aviationweather.gov/adds/dataserver_current/current/metars.cache.csv'
 		self.headerLines = 5
-		self.minutesToUpdate = 10
+		self.minutes_till_update = 10
 		self.data = None
 		self.weather_json_url = './weather_data.json'
 
@@ -67,11 +67,11 @@ class Weather():
 
 		return 1
 
-	def getMetar(self, airportCode):
+	def getMetar(self, airport_code):
 
 		if self.loadMetars() == 1:
 			try:
-				return 1, self.data[airportCode]
+				return 1, self.data[airport_code]
 			except KeyError:
 				return 0, {'Error': 'Invalid airport code'}
 
@@ -92,7 +92,7 @@ class Weather():
 				modified = os.path.getmtime(self.weather_json_url)
 				print("Data last pulled: ", time.ctime(modified))
 				print("Time now: ", time.ctime(time.time()))
-				if (time.time() - (self.minutesToUpdate * 60)) > modified:
+				if (time.time() - (self.minutes_till_update * 60)) > modified:
 					print("Pulling new metars...")
 					self.pullMetars()
 					return

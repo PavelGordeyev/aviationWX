@@ -9,32 +9,32 @@ api = Api(app)
 class FlightCategory(Resource):
 
 	def __init__(self):
-		self.url = 'http://127.0.0.1:5000/conditions?airportCode='
+		self.url = 'http://127.0.0.1:5000/conditions?airport_code='
 
 	def get(self):
 
 		parser = reqparse.RequestParser()
-		parser.add_argument('airportCode', required=True, type=str)
+		parser.add_argument('airport_code', required=True, type=str)
 
 		args = parser.parse_args()
-		airportCode = args['airportCode'].upper()
+		airport_code = args['airport_code'].upper()
 
-		res = requests.get(self.url + airportCode)
+		res = requests.get(self.url + airport_code)
 
 		if res.status_code == 404:
 			return {'Error': '404 - Not found'}, 404
 		else:
 			try:
 				return {
-					'airport_code': airportCode,
-					'flight_category': res.json()[airportCode]['flight_category']
+					'airport_code': airport_code,
+					'flight_category': res.json()[airport_code]['flight_category']
 				}, 200
 			except Exception as e:
 				return {
 					"Error": e
 				}, 404
 
-api.add_resource(FlightCategory, '/flightcat')
+api.add_resource(FlightCategory, '/flight_category')
 
 if __name__ == '__main__':
 	app.run(port=8000,debug=True)
