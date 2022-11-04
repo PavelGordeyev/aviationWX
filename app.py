@@ -21,7 +21,7 @@ class AirportConditions(Resource):
 
 		args = parser.parse_args()
 
-		isLoaded, data = wx.getMetar(args['airportCode'])
+		isLoaded, data = wx.getMetar(args['airportCode'].upper())
 
 		if isLoaded:
 			return {
@@ -90,11 +90,14 @@ class Weather():
 				
 				# Check last time the data was modified
 				modified = os.path.getmtime(self.weather_json_url)
-
-				if time.time() - (self.minutesToUpdate * 60 * 1000) > modified:
+				print("Data last pulled: ", time.ctime(modified))
+				print("Time now: ", time.ctime(time.time()))
+				if (time.time() - (self.minutesToUpdate * 60)) > modified:
+					print("Pulling new metars...")
 					self.pullMetars()
 					return
 
+				print("Loading previous metars...")
 				self.data = json.load(f)
 		
 		except FileNotFoundError:
