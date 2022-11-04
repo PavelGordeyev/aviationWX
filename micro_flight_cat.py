@@ -22,7 +22,7 @@ class FlightCategory(Resource):
 		res = requests.get(self.url + airport_code)
 
 		if res.status_code == 404:
-			return {'Error': '404 - Not found'}, 404
+			return res.json(), 404
 		else:
 			try:
 				return {
