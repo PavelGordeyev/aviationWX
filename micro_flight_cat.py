@@ -17,21 +17,22 @@ class FlightCategory(Resource):
 		parser.add_argument('airportCode', required=True, type=str)
 
 		args = parser.parse_args()
+		airportCode = args['airportCode'].upper()
 
-		res = requests.get(self.url + args['airportCode'])
+		res = requests.get(self.url + airportCode)
 
 		if res.status_code == 404:
 			return {'Error': '404 - Not found'}, 404
 		else:
 			try:
 				return {
-					'airport_code': args['airportCode'],
-					'flight_category': res.json()[args['airportCode']]['flight_category']
+					'airport_code': airportCode,
+					'flight_category': res.json()[airportCode]['flight_category']
 				}, 200
 			except Exception as e:
 				return {
 					"Error": e
-				}, 404	
+				}, 404
 
 api.add_resource(FlightCategory, '/flightcat')
 
