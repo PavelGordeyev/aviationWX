@@ -2,3 +2,4 @@ metars.csv
 weather_data.json
 .DS_Store
 .idea/
+__pycache__/
